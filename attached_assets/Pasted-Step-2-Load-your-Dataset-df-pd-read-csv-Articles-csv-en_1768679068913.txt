@@ -1,0 +1,93 @@
+Step 2: Load your Dataset
+
+
+df=pd.read_csv('Articles.csv',encoding='latin-1')
+df
+
+Step 3: PreProcessing the training data
+
+
+import nltk
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+from nltk.stem import PorterStemmer
+import re
+nltk.download('stopwords')
+nltk.download('punkt')
+
+stop_words=set(stopwords.words('english'))
+stemmer=PorterStemmer()
+
+def preprocess_text(text):
+  text=text.lower()
+  text=re.sub(r'[^\w\s]','',text)
+
+  words=text.split()
+
+  preprocessed_text=[stemmer.stem(word) for word in words if word not in stop_words]
+  return " ".join(preprocessed_text)
+
+df['clean_heading']=df['Heading'].apply(preprocess_text)
+df
+
+
+
+Step 4:Initialize The Sentence Transformer Model
+
+model=SentenceTransformer('paraphrase-MiniLM-L6-v2')
+
+
+Step 5: Embedding using BERT
+
+headings=df['clean_heading'].tolist()
+embeddings=model.encode(headings, convert_to_tensor=True)
+
+Step 6:Save the Embeddings
+
+
+import pickle
+pickle.dump(embeddings,open('embeddings.pkl','wb'))
+embeddings=pickle.load(open('embeddings.pkl','rb'))
+
+Step 6:Recommendations
+
+
+def recommend_articles_from_search(query,df,embeddings,model,num_recommendations=5):
+  #preprocess the query
+  query=preprocess_text(query)
+  #encode the query
+  query_embedding=model.encode(query,convert_to_tensor=True)
+  #ensure query embeddings and article embeddings are on the cpu
+  query_embedding=query_embedding.cpu()
+  embeddings_cpu=embeddings.cpu()
+
+
+  #similar calculate for user query for all my db embeddings
+
+  similarities=cosine_similarity(query_embedding.reshape(1,-1),embeddings_cpu)
+  similarities=similarities.flatten()
+  top_indices=similarities.argsort()[-num_recommendations:][::-1]
+  recommended_articles= df.iloc[top_indices][['Heading','NewsType','Article']]
+  return recommended_articles
+
+
+#example
+
+query="Asian market upswing"
+recommended_artucles=recommend_articles_from_search(query,df,embeddings,model,num_recommendations=10)
+print(recommended_artucles)
+
+
+
+
+this is what i have built using recommendation system now i want to open pycharm which shou;d consists of .ipynbcheckpoints folde
+books datasets folders
+venv folder
+in venv folder there should be
+all recommendation dile
+app.py file
+build a context... file
+nws bert.py file
+search.py file
+then folder shoul d be like extended libararies
+scratches and consoles

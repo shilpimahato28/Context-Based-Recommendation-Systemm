@@ -1,0 +1,25 @@
+# Environment variables
+.env
+
+# Node
+node_modules/
+
+# Python
+__pycache__/
+.cache/
+
+# Builds
+dist/
+build/
+
+# Vercel
+.vercel/
+
+# OS files
+.DS_Store
+
+# Archives
+*.tar.gz
+
+# Server generated files (only if not source code)
+server/public/

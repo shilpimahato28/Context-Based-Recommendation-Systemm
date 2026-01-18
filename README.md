@@ -50,5 +50,4 @@ This project uses **context‑based techniques** to enhance relevance and person
 ├── main.py                  # Main runner file
 ├── requirements.txt         # Python dependencies
 ├── package.json             # Node dependencies
-├── Dockerfile               # Deployment (optional)
 ├── README.md                # Documentation
